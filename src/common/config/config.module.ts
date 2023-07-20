@@ -1,6 +1,7 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigModule as NestConfigModule } from '@nestjs/config';
 import configuration from './configuration';
+import { validate } from './env.validation';
 
 @Global()
 @Module({
@@ -8,6 +9,7 @@ import configuration from './configuration';
     NestConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
+      validate,
     }),
   ],
 })
