@@ -1,14 +1,14 @@
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { StringField, EmailField } from '../../../decorators/fields';
 
-// TODO: better criteria
+// TODO: better criteria for password
 
 export class RegisterDto {
-  @IsEmail()
+  @EmailField({ required: true })
   email: string;
 
-  @IsNotEmpty()
+  @StringField({ required: true, minLength: 4, maxLength: 30 })
   username: string;
 
-  @IsNotEmpty()
+  @StringField({ required: true, minLength: 8, maxLength: 30 })
   password: string;
 }
