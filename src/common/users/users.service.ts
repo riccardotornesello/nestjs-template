@@ -22,8 +22,6 @@ export class UsersService {
     email: string,
     password: string,
   ): Promise<User> {
-    // TODO: use hashing
-
     const user = new this.userModel({ username, email, password });
     return user.save();
   }
