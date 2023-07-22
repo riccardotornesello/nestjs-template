@@ -25,7 +25,7 @@ export class CacheInterceptor extends NodeCacheInterceptor {
 
     const requestUrl = httpAdapter.getRequestUrl(request);
     if (request.user) {
-      return `cache-${request.user.id}-${requestUrl}`;
+      return `cache-${request.user._id}-${requestUrl}`;
     } else {
       return `cache-${requestUrl}`;
     }
