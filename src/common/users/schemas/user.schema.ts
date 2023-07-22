@@ -1,17 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Expose } from 'class-transformer';
-import { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
+import { BaseSchema } from '../../../schemas/base.schema';
 
 export type UserDocument = HydratedDocument<User>;
 
 @Schema()
-export class User {
-  // TODO: create base class witn _id
-  // TODO: transform object id
-
-  @Expose()
-  _id: Types.ObjectId;
-
+export class User extends BaseSchema {
   @Expose()
   @Prop({ type: String, required: true })
   username: string;

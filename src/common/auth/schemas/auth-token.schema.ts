@@ -1,14 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Expose } from 'class-transformer';
 import { HydratedDocument, Types } from 'mongoose';
+import { BaseSchema } from '../../../schemas/base.schema';
 
 export type AuthTokenDocument = HydratedDocument<AuthToken>;
 
 @Schema()
-export class AuthToken {
-  @Expose()
-  _id: Types.ObjectId;
-
+export class AuthToken extends BaseSchema {
   @Prop({ type: Types.ObjectId })
   userId: Types.ObjectId;
 
