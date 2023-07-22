@@ -7,8 +7,6 @@ import {
 @Injectable()
 export class CacheInterceptor extends NodeCacheInterceptor {
   trackBy(context: ExecutionContext): string | undefined {
-    // TODO: manage authentication
-
     const httpAdapter = this.httpAdapterHost.httpAdapter;
     const isHttpApp = httpAdapter && !!httpAdapter.getRequestMethod;
     const cacheMetadata = this.reflector.get(
@@ -24,6 +22,12 @@ export class CacheInterceptor extends NodeCacheInterceptor {
     if (!this.isRequestCacheable(context)) {
       return undefined;
     }
-    return httpAdapter.getRequestUrl(request);
+
+    const requestUrl = httpAdapter.getRequestUrl(request);
+    if (request.user) {
+      return `cache-${request.user.id}-${requestUrl}`;
+    } else {
+      return `cache-${requestUrl}`;
+    }
   }
 }
