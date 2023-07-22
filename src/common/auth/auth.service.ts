@@ -40,7 +40,7 @@ export class AuthService {
   ): Promise<User> {
     const passHash = await bcrypt.hash(
       password,
-      this.configService.get<number>('bcryptRounds'),
+      this.configService.get<number>('crypto.bcryptRounds'),
     );
     const user = await this.usersService.create(username, email, passHash);
     return plainToInstance(User, user);
@@ -57,7 +57,7 @@ export class AuthService {
     const token = crypto.randomBytes(20).toString('hex');
     const tokenHash = await bcrypt.hash(
       token,
-      this.configService.get<number>('bcryptRounds'),
+      this.configService.get<number>('crypto.bcryptRounds'),
     );
 
     const authToken = new this.authTokenModel({
