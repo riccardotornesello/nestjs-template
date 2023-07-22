@@ -11,6 +11,7 @@ import {
   BearerStrategy,
 } from './strategies';
 import { AuthToken, AuthTokenSchema } from './schemas';
+import { AuthController } from './auth.controller';
 
 // Dependencies
 import { UsersModule } from '../users/users.module';
@@ -27,7 +28,7 @@ import { UsersModule } from '../users/users.module';
       { name: AuthToken.name, schema: AuthTokenSchema },
     ]),
   ],
-
+  controllers: [AuthController],
   providers: [
     AuthService,
     LocalStrategy,
