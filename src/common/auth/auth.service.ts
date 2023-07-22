@@ -15,27 +15,39 @@ export class AuthService {
   ) {}
 
   async validateUser(username: string, pass: string): Promise<any> {
-    const user = await this.usersService.findOne(username);
+    const user = await this.usersService.findByUsername(username);
     if (user && user.password === pass) {
-      const { password, ...result } = user;
-      return result;
+      return user;
     }
     return null;
   }
 
-  async login(user: User) {
+  async registerUser(
+    username: string,
+    email: string,
+    password: string,
+  ): Promise<User> {
+    const user = await this.usersService.create(username, email, password);
+    return user;
+  }
+
+  async generateUserJwt(user: User) {
     const payload = { username: user.username, sub: user._id };
     return {
       access_token: this.jwtService.sign(payload),
     };
   }
 
-  async register(username: string, email: string, password: string) {
-    const user = await this.usersService.create(username, email, password);
-    return this.login(user);
+  async generateAuthToken(user: any): Promise<AuthToken> {
+    const token = new this.authTokenModel({
+      userId: user._id,
+      // TODO: generate random string
+      token: this.jwtService.sign({ sub: user._id }),
+    });
+    return token.save();
   }
 
-  async validateToken(token: string): Promise<AuthToken> {
+  async validateAuthToken(token: string): Promise<AuthToken> {
     // TODO: use hashing
 
     const authToken = await this.authTokenModel.findOne({ token });

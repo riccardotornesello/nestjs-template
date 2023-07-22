@@ -5,7 +5,7 @@ export type AuthTokenDocument = HydratedDocument<AuthToken>;
 
 @Schema()
 export class AuthToken {
-  @Prop({ type: Types.ObjectId, ref: 'User' })
+  @Prop({ type: Types.ObjectId })
   userId: Types.ObjectId;
 
   @Prop({ type: String, required: true })
