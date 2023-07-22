@@ -23,7 +23,10 @@ export class BearerStrategy extends PassportStrategy(Strategy) {
     const tokenId = tokenParts[0];
     const tokenSecret = tokenParts[1];
 
-    const authToken = await this.authService.validateAuthToken(tokenId, tokenSecret);
+    const authToken = await this.authService.validateAuthToken(
+      tokenId,
+      tokenSecret,
+    );
     if (!authToken) {
       throw new UnauthorizedException();
     }

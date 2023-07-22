@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
@@ -53,7 +53,7 @@ export class AuthService {
     };
   }
 
-  async generateAuthToken(user: any): Promise<AuthToken> {
+  async generateAuthToken(user: any): Promise<string> {
     const token = crypto.randomBytes(20).toString('hex');
     const tokenHash = await bcrypt.hash(
       token,
@@ -66,7 +66,7 @@ export class AuthService {
     });
     await authToken.save();
 
-    return plainToInstance(AuthToken, token);
+    return `${authToken._id.toString()}:${token}`;
   }
 
   async validateAuthToken(
@@ -83,6 +83,6 @@ export class AuthService {
       return null;
     }
 
-    return plainToInstance(AuthToken, authToken);
+    return authToken
   }
 }

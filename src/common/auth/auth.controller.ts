@@ -18,7 +18,9 @@ export class AuthController {
   @Post('login')
   async login(@Request() req) {
     const token = await this.authService.generateAuthToken(req.user);
-    return token;
+    return {
+      authenticationToken: token,
+    };
   }
 
   @Post('register')
