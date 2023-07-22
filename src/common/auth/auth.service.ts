@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { plainToInstance } from 'class-transformer';
 import { UsersService } from '../users/users.service';
 import { AuthToken } from './schemas';
 import { User } from '../users/schemas';
@@ -16,10 +17,11 @@ export class AuthService {
 
   async validateUser(username: string, pass: string): Promise<any> {
     const user = await this.usersService.findByUsername(username);
-    if (user && user.password === pass) {
-      return user;
+    if (!user || user.password !== pass) {
+      return null;
     }
-    return null;
+
+    return plainToInstance(User, user);
   }
 
   async registerUser(
@@ -28,7 +30,7 @@ export class AuthService {
     password: string,
   ): Promise<User> {
     const user = await this.usersService.create(username, email, password);
-    return user;
+    return plainToInstance(User, user);
   }
 
   async generateUserJwt(user: User) {
@@ -44,13 +46,15 @@ export class AuthService {
       // TODO: generate random string
       token: this.jwtService.sign({ sub: user._id }),
     });
-    return token.save();
+    await token.save();
+
+    return plainToInstance(AuthToken, token);
   }
 
   async validateAuthToken(token: string): Promise<AuthToken> {
     // TODO: use hashing
 
     const authToken = await this.authTokenModel.findOne({ token });
-    return authToken;
+    return plainToInstance(AuthToken, authToken);
   }
 }
