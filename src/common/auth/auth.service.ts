@@ -1,6 +1,9 @@
+import * as bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
+import { ConfigService } from '@nestjs/config';
 import { Model } from 'mongoose';
 import { plainToInstance } from 'class-transformer';
 import { UsersService } from '../users/users.service';
@@ -12,12 +15,18 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private configService: ConfigService,
     @InjectModel(AuthToken.name) private authTokenModel: Model<AuthToken>,
   ) {}
 
   async validateUser(username: string, pass: string): Promise<any> {
     const user = await this.usersService.findByUsername(username);
-    if (!user || user.password !== pass) {
+    if (!user) {
+      return null;
+    }
+
+    const passMatch = await bcrypt.compare(pass, user.password);
+    if (!passMatch) {
       return null;
     }
 
@@ -29,7 +38,11 @@ export class AuthService {
     email: string,
     password: string,
   ): Promise<User> {
-    const user = await this.usersService.create(username, email, password);
+    const passHash = await bcrypt.hash(
+      password,
+      this.configService.get<number>('bcryptRounds'),
+    );
+    const user = await this.usersService.create(username, email, passHash);
     return plainToInstance(User, user);
   }
 
@@ -41,20 +54,35 @@ export class AuthService {
   }
 
   async generateAuthToken(user: any): Promise<AuthToken> {
-    const token = new this.authTokenModel({
+    const token = crypto.randomBytes(20).toString('hex');
+    const tokenHash = await bcrypt.hash(
+      token,
+      this.configService.get<number>('bcryptRounds'),
+    );
+
+    const authToken = new this.authTokenModel({
       userId: user._id,
-      // TODO: generate random string
-      token: this.jwtService.sign({ sub: user._id }),
+      secret: tokenHash,
     });
-    await token.save();
+    await authToken.save();
 
     return plainToInstance(AuthToken, token);
   }
 
-  async validateAuthToken(token: string): Promise<AuthToken> {
-    // TODO: use hashing
+  async validateAuthToken(
+    id: string,
+    token: string,
+  ): Promise<AuthToken | null> {
+    const authToken = await this.authTokenModel.findById(id);
+    if (!authToken) {
+      return null;
+    }
 
-    const authToken = await this.authTokenModel.findOne({ token });
+    const tokenMatch = await bcrypt.compare(token, authToken.secret);
+    if (!tokenMatch) {
+      return null;
+    }
+
     return plainToInstance(AuthToken, authToken);
   }
 }

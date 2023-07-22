@@ -11,7 +11,7 @@ export class AuthToken {
 
   @Expose()
   @Prop({ type: String, required: true })
-  token: string;
+  secret: string;
 }
 
 export const AuthTokenSchema = SchemaFactory.createForClass(AuthToken);

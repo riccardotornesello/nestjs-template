@@ -14,7 +14,16 @@ export class BearerStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(token: string): Promise<any> {
-    const authToken = await this.authService.validateAuthToken(token);
+    // check if token is in format id:secret
+    const tokenParts = token.split(':');
+    if (tokenParts.length !== 2) {
+      throw new UnauthorizedException();
+    }
+
+    const tokenId = tokenParts[0];
+    const tokenSecret = tokenParts[1];
+
+    const authToken = await this.authService.validateAuthToken(tokenId, tokenSecret);
     if (!authToken) {
       throw new UnauthorizedException();
     }
