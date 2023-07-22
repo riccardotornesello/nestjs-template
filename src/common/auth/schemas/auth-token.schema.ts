@@ -6,6 +6,9 @@ export type AuthTokenDocument = HydratedDocument<AuthToken>;
 
 @Schema()
 export class AuthToken {
+  @Expose()
+  _id: Types.ObjectId;
+
   @Prop({ type: Types.ObjectId })
   userId: Types.ObjectId;
 
