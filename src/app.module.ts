@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import appConfig from './app.config';
 
 // Common modules
-import { ConfigModule } from './common/config/config.module';
 import { CacheModule } from './common/cache/cache.module';
 import { AuthModule } from './common/auth/auth.module';
 import { UsersModule } from './common/users/users.module';
@@ -19,7 +19,9 @@ import { UsersModule } from './common/users/users.module';
       }),
       inject: [ConfigService],
     }),
-    ConfigModule,
+    ConfigModule.forRoot({
+      load: [appConfig],
+    }),
     CacheModule,
     AuthModule,
     UsersModule,
